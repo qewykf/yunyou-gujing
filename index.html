@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>云游古境 — 私人定制文化旅游</title>
+<style>
+/* ================= 基础变量 ================= */
+:root {
+  --primary: #8B5A2B;
+  --primary-light: #A67B5B;
+  --primary-dark: #6B4423;
+  --secondary: #7F8C8D;
+  --accent: #A69E78;
+  --bg: #F4F1EA;
+  --surface: #EDE8DE;
+  --text: #3D3229;
+  --text-light: #7F8C8D;
+  --border: #D4CFC5;
+  --radius: 8px;
+  --font-serif: "Noto Serif SC", "Source Han Serif SC", "SimSun", "STSong", serif;
+  --font-sans: "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
+
+  /* 非线性动画曲线 */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-out-back: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-circ: cubic-bezier(0.075, 0.82, 0.165, 1);
+  --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-dramatic: cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ================= 导航栏 ================= */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: rgba(244,241,234,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
+  transition: all 0.5s var(--ease-out-expo);
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.nav.visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.nav.scrolled {
+  padding: 10px 0;
+  box-shadow: 0 2px 20px rgba(139,90,43,0.08);
+  background: rgba(244,241,234,0.96);
+}
+
+.nav .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+  letter-spacing: 0.15em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.4s var(--ease-out-back);
+}
+
+.nav-brand:hover {
+  transform: scale(1.02);
+}
+
+.nav-brand::before {
+  content: "";
+  display: inline-block;
+  width: 28px; height: 28px;
+  background: var(--primary);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+
+.nav-links {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+  align-items: center;
+}
+
+.nav-links a {
+  color: var(--text-light);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  transition: all 0.4s var(--ease-out-expo);
+  position: relative;
+  font-family: var(--font-serif);
+  display: inline-block;
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  bottom: -4px; left: 50%;
+  width: 0; height: 2px;
+  background: var(--primary);
+  transition: all 0.4s var(--ease-out-back);
+  transform: translateX(-50%);
+}
+
+.nav-links a:hover {
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1001;
+}
+
+.menu-toggle span {
+  display: block;
+  width: 24px; height: 2px;
+  background: var(--primary);
+  transition: all 0.4s var(--ease-in-out-back);
+}
+
+/* ================= 通用板块 ================= */
+.section {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  overflow: hidden;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+/* ================= 全局动画系统 ================= */
+
+/* 基础状态：所有动画元素初始隐藏 */
+.anim-fade-up,
+.anim-fade-down,
+.anim-fade-left,
+.anim-fade-right,
+.anim-scale,
+.anim-blur,
+.anim-clip {
+  opacity: 0;
+  transition: none;
+}
+
+/* 当板块进入视图时，子元素触发动画 */
+.section.in-view .anim-fade-up {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.9s var(--ease-out-expo), transform 0.9s var(--ease-out-expo);
+}
+
+.section.in-view .anim-fade-down {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.9s var(--ease-out-expo), transform 0.9s var(--ease-out-expo);
+}
+
+.section.in-view .anim-fade-left {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.9s var(--ease-out-expo), transform 0.9s var(--ease-out-expo);
+}
+
+.section.in-view .anim-fade-right {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.9s var(--ease-out-expo), transform 0.9s var(--ease-out-expo);
+}
+
+.section.in-view .anim-scale {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.8s var(--ease-out-back), transform 0.8s var(--ease-out-back);
+}
+
+.section.in-view .anim-blur {
+  opacity: 1;
+  filter: blur(0);
+  transition: opacity 1s var(--ease-out-quart), filter 1s var(--ease-out-quart);
+}
+
+.section.in-view .anim-clip {
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
+  transition: opacity 1s var(--ease-out-expo), clip-path 1.2s var(--ease-out-expo);
+}
+
+/* 初始偏移状态 */
+.anim-fade-up { transform: translateY(60px); }
+.anim-fade-down { transform: translateY(-60px); }
+.anim-fade-left { transform: translateX(-80px); }
+.anim-fade-right { transform: translateX(80px); }
+.anim-scale { transform: scale(0.85); }
+.anim-blur { filter: blur(12px); }
+.anim-clip { clip-path: inset(0 100% 0 0); }
+
+/* 延迟系统 */
+.delay-1 { transition-delay: 0.15s !important; }
+.delay-2 { transition-delay: 0.3s !important; }
+.delay-3 { transition-delay: 0.45s !important; }
+.delay-4 { transition-delay: 0.6s !important; }
+.delay-5 { transition-delay: 0.75s !important; }
+.delay-6 { transition-delay: 0.9s !important; }
+
+/* 退出动画 */
+.section.exiting .anim-fade-up,
+.section.exiting .anim-fade-down,
+.section.exiting .anim-fade-left,
+.section.exiting .anim-fade-right,
+.section.exiting .anim-scale,
+.section.exiting .anim-blur,
+.section.exiting .anim-clip {
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-smooth);
+}
+
+.section.exiting .anim-fade-up { transform: translateY(-30px); }
+.section.exiting .anim-fade-down { transform: translateY(30px); }
+.section.exiting .anim-fade-left { transform: translateX(40px); }
+.section.exiting .anim-fade-right { transform: translateX(-40px); }
+.section.exiting .anim-scale { transform: scale(0.95); }
+.section.exiting .anim-blur { filter: blur(6px); }
+
+/* 图片渐入 */
+.img-reveal {
+  opacity: 0;
+  transform: scale(1.1);
+  filter: blur(4px);
+  transition: all 1.2s var(--ease-out-quart);
+}
+
+.section.in-view .img-reveal {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+}
+
+/* ================= HERO 区域 ================= */
+.hero {
+  text-align: center;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.hero-bg-img {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: url('hero-bg.png') center center / cover no-repeat;
+  opacity: 0.25;
+  transform: scale(1.1);
+  transition: transform 2s var(--ease-out-quart), opacity 1.5s var(--ease-out-quart);
+}
+
+.section.in-view .hero-bg-img {
+  transform: scale(1);
+  opacity: 0.3;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(244,241,234,0.3) 0%, rgba(244,241,234,0.7) 60%, var(--bg) 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 160px 0 100px;
+}
+
+.hero-tag {
+  display: inline-block;
+  padding: 8px 24px;
+  border: 1px solid var(--primary);
+  border-radius: 50px;
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  margin-bottom: 32px;
+  font-family: var(--font-serif);
+  background: rgba(139,90,43,0.06);
+  backdrop-filter: blur(4px);
+}
+
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 24px;
+  color: var(--text);
+  letter-spacing: 0.1em;
+}
+
+.hero h1 span {
+  color: var(--primary);
+  display: block;
+  font-size: 0.6em;
+  letter-spacing: 0.2em;
+  margin-top: 12px;
+  font-weight: 400;
+}
+
+.hero-desc {
+  font-size: 1.15rem;
+  color: var(--text-light);
+  max-width: 560px;
+  margin: 0 auto 48px;
+  line-height: 2;
+  letter-spacing: 0.05em;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ink-divider {
+  width: 120px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  margin: 32px auto;
+  opacity: 0.4;
+  border-radius: 2px;
+}
+
+/* ================= 按钮样式 ================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.5s var(--ease-out-back);
+  cursor: pointer;
+  border: 2px solid transparent;
+  font-family: var(--font-serif);
+  letter-spacing: 0.1em;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s var(--ease-out-expo);
+}
+
+.btn:hover::before {
+  transform: translateX(100%);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 4px 20px rgba(139,90,43,0.25);
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(139,90,43,0.35);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border-color: var(--primary);
+  backdrop-filter: blur(4px);
+}
+
+.btn-outline:hover {
+  background: var(--primary);
+  color: #fff;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(139,90,43,0.2);
+}
+
+/* ================= 关于我们 ================= */
+.about {
+  background: var(--surface);
+}
+
+.about-bg-wood {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: url('wood-texture.png') center center / cover no-repeat;
+  opacity: 0.04;
+  mix-blend-mode: multiply;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+.about-visual {
+  position: relative;
+  aspect-ratio: 4/5;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%);
+  box-shadow: 0 20px 60px rgba(139,90,43,0.15);
+}
+
+.about-visual-img {
+  position: absolute;
+  inset: 0;
+  background: url('about-visual.jpg') center center / cover no-repeat;
+  opacity: 0.9;
+  transition: transform 1.5s var(--ease-out-quart);
+}
+
+.section.in-view .about-visual-img {
+  transform: scale(1);
+}
+
+.about-visual::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(61,50,41,0.3) 100%);
+  z-index: 1;
+}
+
+.about-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, transparent 0px, transparent 3px, rgba(107,68,35,0.04) 3px, rgba(107,68,35,0.04) 5px),
+    repeating-linear-gradient(0deg, transparent 0px, transparent 40px, rgba(107,68,35,0.02) 40px, rgba(107,68,35,0.02) 41px);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.about-content h2 {
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: var(--text);
+  letter-spacing: 0.1em;
+}
+
+.about-content h2::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: var(--primary);
+  margin-top: 16px;
+  border-radius: 2px;
+  transition: width 0.8s var(--ease-out-back);
+}
+
+.section.in-view .about-content h2::after {
+  width: 80px;
+}
+
+.about-content p {
+  color: var(--text-light);
+  font-size: 1.05rem;
+  line-height: 2.2;
+  margin-bottom: 20px;
+  text-align: justify;
+}
+
+/* ================= 团队介绍 ================= */
+.team {
+  background: linear-gradient(180deg, var(--bg) 0%, var(--surface) 100%);
+  text-align: center;
+}
+
+.team-stone-bg {
+  position: absolute;
+  right: -10%;
+  top: -10%;
+  width: 50%;
+  height: 60%;
+  background: url('stone-buddha.png') center center / contain no-repeat;
+  opacity: 0.04;
+  z-index: 0;
+  pointer-events: none;
+  filter: grayscale(0.3);
+}
+
+.team-header {
+  margin-bottom: 64px;
+}
+
+.team-header h2 {
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+  letter-spacing: 0.1em;
+}
+
+.team-header p {
+  color: var(--text-light);
+  font-size: 1.1rem;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 48px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.team-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 48px 32px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.6s var(--ease-out-back);
+}
+
+.team-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(127,140,141,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 70% 60%, rgba(166,158,120,0.05) 0%, transparent 40%);
+  filter: contrast(1.3);
+  pointer-events: none;
+}
+
+.team-card::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+  opacity: 0.3;
+  transition: opacity 0.4s ease;
+}
+
+.team-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 24px 56px rgba(139,90,43,0.14);
+  border-color: var(--accent);
+}
+
+.team-card:hover::after {
+  opacity: 0.6;
+}
+
+/* 石刻佛像背景装饰 */
+.team-card .buddha-deco {
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+  width: 120px;
+  height: 160px;
+  background: url('stone-buddha.png') center center / contain no-repeat;
+  opacity: 0.06;
+  z-index: 0;
+  pointer-events: none;
+  transition: all 0.8s var(--ease-out-quart);
+}
+
+.team-card:hover .buddha-deco {
+  opacity: 0.1;
+  transform: translateY(-10px);
+}
+
+.avatar-placeholder {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  margin: 0 auto 28px;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--border) 100%);
+  border: 3px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  transition: all 0.5s var(--ease-out-back);
+}
+
+.team-card:hover .avatar-placeholder {
+  border-color: var(--accent);
+  box-shadow: 0 8px 24px rgba(139,90,43,0.15);
+  transform: scale(1.05);
+}
+
+.avatar-placeholder::before {
+  content: "";
+  width: 70px;
+  height: 70px;
+  background: var(--text-light);
+  opacity: 0.12;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 15 C55 15 60 20 60 28 C60 32 58 35 55 37 L55 42 L65 45 L65 55 L55 52 L55 65 L60 75 L55 80 L50 75 L45 80 L40 75 L45 65 L45 52 L35 55 L35 45 L45 42 L45 37 C42 35 40 32 40 28 C40 20 45 15 50 15Z' fill='white'/%3E%3C/svg%3E") center/contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 15 C55 15 60 20 60 28 C60 32 58 35 55 37 L55 42 L65 45 L65 55 L55 52 L55 65 L60 75 L55 80 L50 75 L45 80 L40 75 L45 65 L45 52 L35 55 L35 45 L45 42 L45 37 C42 35 40 32 40 28 C40 20 45 15 50 15Z' fill='white'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+
+.team-card h3 {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.05em;
+}
+
+.team-card .role {
+  font-size: 0.9rem;
+  color: var(--primary);
+  margin-bottom: 20px;
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.1em;
+}
+
+.team-card .bio {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  line-height: 1.9;
+  position: relative;
+  z-index: 1;
+  min-height: 80px;
+}
+
+/* ================= 服务特色 ================= */
+.features {
+  background: var(--surface);
+}
+
+.features-mountain {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 35%;
+  background: url('mountain-ink.png') bottom center / cover no-repeat;
+  opacity: 0.08;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.features-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.features-header h2 {
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+  letter-spacing: 0.1em;
+}
+
+.features-header p {
+  color: var(--text-light);
+  font-size: 1.1rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.feature-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 40px 28px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.6s var(--ease-out-back);
+}
+
+.feature-card::before {
+  content: "";
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle, rgba(139,90,43,0.05) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.feature-card:hover::before {
+  opacity: 1;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 16px 48px rgba(139,90,43,0.12);
+  border-color: var(--accent);
+}
+
+.feature-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 1.5rem;
+  position: relative;
+  z-index: 1;
+  transition: all 0.5s var(--ease-out-back);
+  box-shadow: 0 4px 16px rgba(139,90,43,0.2);
+}
+
+.feature-card:hover .feature-icon {
+  transform: scale(1.15) rotate(-5deg);
+  box-shadow: 0 8px 24px rgba(139,90,43,0.3);
+}
+
+.feature-card h3 {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text);
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.05em;
+}
+
+.feature-card p {
+  color: var(--text-light);
+  font-size: 0.95rem;
+  line-height: 1.8;
+  position: relative;
+  z-index: 1;
+}
+
+/* ================= CTA / 联系 ================= */
+.cta-section {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  text-align: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 50%, rgba(244,241,234,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 70% 50%, rgba(166,158,120,0.08) 0%, transparent 40%);
+}
+
+.cta-mountain {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40%;
+  background: url('mountain-ink.png') bottom center / cover no-repeat;
+  opacity: 0.06;
+  z-index: 1;
+  pointer-events: none;
+  filter: invert(1);
+}
+
+.cta-box {
+  position: relative;
+  z-index: 2;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.cta-box h2 {
+  font-family: var(--font-serif);
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: 0.1em;
+}
+
+.cta-box p {
+  font-size: 1.15rem;
+  opacity: 0.85;
+  margin-bottom: 40px;
+  line-height: 1.9;
+  letter-spacing: 0.05em;
+}
+
+.cta-box .btn {
+  background: #fff;
+  color: var(--primary);
+  border-color: #fff;
+  font-size: 1.1rem;
+  padding: 16px 40px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.cta-box .btn:hover {
+  background: var(--bg);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+}
+
+.contact-info {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  margin-top: 48px;
+  flex-wrap: wrap;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  opacity: 0.8;
+  transition: all 0.4s var(--ease-out-expo);
+}
+
+.contact-item:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.contact-item svg {
+  width: 20px; height: 20px;
+  opacity: 0.7;
+  transition: transform 0.4s var(--ease-out-back);
+}
+
+.contact-item:hover svg {
+  transform: scale(1.2);
+}
+
+/* ================= 页脚 ================= */
+.footer {
+  padding: 32px 0;
+  text-align: center;
+  color: var(--text-light);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  font-family: var(--font-serif);
+  letter-spacing: 0.1em;
+}
+
+/* ================= 滚动指示器 ================= */
+.scroll-indicator {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-light);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  animation: bounce 2.5s var(--ease-smooth) infinite;
+  z-index: 10;
+}
+
+.scroll-indicator svg {
+  width: 24px; height: 24px;
+  opacity: 0.5;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+  40% { transform: translateX(-50%) translateY(-12px); }
+  60% { transform: translateX(-50%) translateY(-6px); }
+}
+
+/* ================= 视差装饰元素 ================= */
+.parallax-deco {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  transition: transform 0.1s linear;
+}
+
+.ink-splash {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139,90,43,0.06) 0%, transparent 70%);
+  filter: blur(40px);
+}
+
+/* ================= 响应式适配 ================= */
+@media (max-width: 768px) {
+  html {
+    scroll-snap-type: y proximity;
+  }
+
+  .section {
+    min-height: auto;
+    padding: 100px 0 60px;
+    scroll-snap-align: none;
+  }
+
+  .hero {
+    min-height: 100vh;
+    scroll-snap-align: start;
+  }
+
+  .hero-content {
+    padding: 120px 0 80px;
+  }
+
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    background: rgba(244,241,234,0.98);
+    flex-direction: column;
+    padding: 24px;
+    gap: 20px;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    transform: translateY(-10px);
+    opacity: 0;
+    transition: all 0.4s var(--ease-out-expo);
+  }
+
+  .nav-links.active {
+    display: flex;
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  .menu-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+
+  .menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
+
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+
+  .hero h1 span {
+    font-size: 0.55em;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .about-visual {
+    aspect-ratio: 16/10;
+    order: -1;
+  }
+
+  .team-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .about-content h2,
+  .team-header h2,
+  .features-header h2,
+  .cta-box h2 {
+    font-size: 1.8rem;
+  }
+
+  .contact-info {
+    gap: 24px;
+  }
+
+  .scroll-indicator {
+    display: none;
+  }
+
+  .team-stone-bg {
+    width: 80%;
+    opacity: 0.03;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .about-grid {
+    gap: 40px;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ================= 滚动条美化 ================= */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* ================= 页面加载动画 ================= */
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 24px;
+  transition: opacity 0.8s var(--ease-out-quart), visibility 0.8s;
+}
+
+.page-loader.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader-brush {
+  width: 120px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.loader-brush::after {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  background: var(--primary);
+  border-radius: 2px;
+  animation: brushStroke 1.5s var(--ease-out-expo) forwards;
+}
+
+@keyframes brushStroke {
+  0% { width: 0; }
+  100% { width: 100%; }
+}
+
+.loader-text {
+  font-family: var(--font-serif);
+  color: var(--primary);
+  letter-spacing: 0.2em;
+  font-size: 1rem;
+  opacity: 0;
+  animation: fadeIn 0.6s 0.3s var(--ease-out-quart) forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<!-- 页面加载动画 -->
+<div class="page-loader" id="pageLoader">
+  <div class="loader-text">云游古境</div>
+  <div class="loader-brush"></div>
+</div>
+
+<!-- 导航栏 -->
+<nav class="nav" id="navbar">
+  <div class="container">
+    <a href="#" class="nav-brand">云游古境</a>
+    <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#about">关于我们</a></li>
+      <li><a href="#team">团队介绍</a></li>
+      <li><a href="#features">服务特色</a></li>
+      <li><a href="#contact">联系我们</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO 区域 -->
+<section class="section hero" id="hero">
+  <div class="hero-bg-img"></div>
+  <div class="hero-overlay"></div>
+  <div class="parallax-deco ink-splash" style="top:10%;left:-5%;" data-speed="0.3"></div>
+  <div class="parallax-deco ink-splash" style="bottom:20%;right:-8%;" data-speed="0.5"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-tag anim-scale">私人定制 · 文化深度游</div>
+      <h1 class="anim-fade-up delay-1">
+        云游古境
+        <span>探寻千年文化之美</span>
+      </h1>
+      <div class="ink-divider anim-scale delay-2"></div>
+      <p class="hero-desc anim-fade-up delay-2">
+        我们专注于古建筑、石刻艺术与山水人文的深度探索，<br>
+        为您打造独一无二的东方文化之旅。
+      </p>
+      <div class="hero-actions anim-fade-up delay-3">
+        <a href="#contact" class="btn btn-primary">开启旅程</a>
+        <a href="#about" class="btn btn-outline">了解更多</a>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator anim-fade-down delay-5">
+    <span>向下滚动</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+</section>
+
+<!-- 关于我们 -->
+<section class="section about" id="about">
+  <div class="about-bg-wood img-reveal"></div>
+  <div class="parallax-deco ink-splash" style="top:5%;right:5%;" data-speed="0.2"></div>
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-visual anim-fade-right delay-1">
+        <div class="about-visual-img img-reveal delay-2"></div>
+      </div>
+      <div class="about-content">
+        <h2 class="anim-fade-left">关于云游古境</h2>
+        <p class="anim-fade-left delay-1">
+          云游古境成立于对东方美学的深切热爱之中。我们相信，每一次旅行都是一次与历史对话的契机。从千年古刹的晨钟暮鼓，到石窟造像的庄严慈悲，从江南水乡的粉墙黛瓦，到西北大漠的孤烟落日——我们带您走进的不仅是风景，更是流淌在砖瓦木石之间的文化血脉。
+        </p>
+        <p class="anim-fade-left delay-2">
+          我们的团队由资深文化学者、专业导游与旅行策划师组成，致力于为每一位旅者量身定制深度文化体验。不追逐打卡式的匆忙，只追求沉浸式的感悟。
+        </p>
+        <div class="anim-fade-left delay-3" style="margin-top: 32px;">
+          <a href="#team" class="btn btn-outline">认识我们的团队</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 团队介绍 -->
+<section class="section team" id="team">
+  <div class="team-stone-bg img-reveal"></div>
+  <div class="parallax-deco ink-splash" style="bottom:10%;left:-3%;" data-speed="0.4"></div>
+  <div class="container">
+    <div class="team-header">
+      <h2 class="anim-fade-up">核心团队</h2>
+      <p class="anim-fade-up delay-1">以专业与热忱，守护每一段文化旅程</p>
+    </div>
+    <div class="team-grid">
+      <!-- 成员一 -->
+      <div class="team-card anim-fade-up delay-1">
+        <div class="buddha-deco"></div>
+        <div class="avatar-placeholder"></div>
+        <h3>[陈彪]</h3>
+        <div class="role">资深导游/国保讲解员</div>
+        <p class="bio">
+          [此处预留团队成员简介文本位置。可填写个人背景、专业领域、从业经历及负责的主要工作内容。]
+        </p>
+      </div>
+      <!-- 成员二 -->
+      <div class="team-card anim-fade-up delay-2">
+        <div class="buddha-deco"></div>
+        <div class="avatar-placeholder"></div>
+        <h3>[黄鹄]</h3>
+        <div class="role">行程规划师/旅行策划</div>
+        <p class="bio">
+          [此处预留团队成员简介文本位置。可填写个人背景、专业领域、从业经历及负责的主要工作内容。]
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 服务特色 -->
+<section class="section features" id="features">
+  <div class="features-mountain img-reveal"></div>
+  <div class="parallax-deco ink-splash" style="top:15%;right:0%;" data-speed="0.3"></div>
+  <div class="container">
+    <div class="features-header">
+      <h2 class="anim-fade-up">服务特色</h2>
+      <p class="anim-fade-up delay-1">四大维度，构筑完整的文化旅行体验</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card anim-fade-up delay-1">
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l8-4 8 4v14M9 21v-6h6v6"/></svg>
+        </div>
+        <h3>古建筑探访</h3>
+        <p>深入探访保存完好的古代建筑群，从宫殿庙宇到民居园林，解读木构斗拱间的营造智慧。</p>
+      </div>
+      <div class="feature-card anim-fade-up delay-2">
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <h3>石刻艺术之旅</h3>
+        <p>寻访石窟、摩崖与碑刻，在风化斑驳的石纹中，感受千年信仰与艺术的交融沉淀。</p>
+      </div>
+      <div class="feature-card anim-fade-up delay-3">
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <h3>山水人文行</h3>
+        <p>循着古人足迹，于名山大川间品读诗词意境，在水墨画卷般的风景中体悟东方哲学。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 联系我们 -->
+<section class="section cta-section" id="contact">
+  <div class="cta-mountain img-reveal"></div>
+  <div class="parallax-deco ink-splash" style="top:20%;left:5%;" data-speed="0.25"></div>
+  <div class="container">
+    <div class="cta-box">
+      <h2 class="anim-fade-up">开启您的文化之旅</h2>
+      <p class="anim-fade-up delay-1">
+        无论是寻访一座古刹，还是踏遍千里山河，<br>
+        我们都将为您量身打造专属的旅行记忆。
+      </p>
+      <div class="anim-fade-up delay-2">
+        <a href="mailto:hello@yunyougujing.com" class="btn">立即咨询</a>
+      </div>
+      <div class="contact-info anim-fade-up delay-3">
+        <div class="contact-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>hello@yunyougujing.com</span>
+        </div>
+        <div class="contact-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>18610191159</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 页脚 -->
+<footer class="footer">
+  <div class="container">
+    &copy; 2026 云游古境 · 私人定制文化旅游 &nbsp;|&nbsp; 保留所有权利
+  </div>
+</footer>
+
+<script>
+// 页面加载完成后隐藏loader
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('pageLoader').classList.add('hidden');
+    // 导航栏入场
+    setTimeout(() => {
+      document.getElementById('navbar').classList.add('visible');
+    }, 300);
+    // Hero区域入场
+    setTimeout(() => {
+      document.getElementById('hero').classList.add('in-view');
+    }, 600);
+  }, 1800);
+});
+
+// 移动端菜单切换
+function toggleMenu() {
+  const navLinks = document.getElementById('navLinks');
+  const toggle = document.getElementById('menuToggle');
+  navLinks.classList.toggle('active');
+  toggle.classList.toggle('active');
+}
+
+// 点击导航链接后关闭菜单
+document.querySelectorAll('.nav-links a').forEach(link => {
+  link.addEventListener('click', () => {
+    const navLinks = document.getElementById('navLinks');
+    const toggle = document.getElementById('menuToggle');
+    navLinks.classList.remove('active');
+    toggle.classList.remove('active');
+  });
+});
+
+// 滚动入场/退场动画系统（Intersection Observer）
+const sections = document.querySelectorAll('.section');
+
+const sectionObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    const section = entry.target;
+    if (entry.isIntersecting) {
+      section.classList.add('in-view');
+      section.classList.remove('exiting');
+    } else {
+      // 只有当完全离开视口时才添加exiting
+      if (entry.boundingClientRect.top > 0 || entry.boundingClientRect.bottom < window.innerHeight) {
+        section.classList.remove('in-view');
+        section.classList.add('exiting');
+      }
+    }
+  });
+}, {
+  threshold: [0, 0.15, 0.5, 1],
+  rootMargin: '-5% 0px -5% 0px'
+});
+
+sections.forEach(section => sectionObserver.observe(section));
+
+// 导航栏滚动效果
+let lastScroll = 0;
+const nav = document.getElementById('navbar');
+
+window.addEventListener('scroll', () => {
+  const currentScroll = window.pageYOffset;
+  
+  if (currentScroll > 100) {
+    nav.classList.add('scrolled');
+  } else {
+    nav.classList.remove('scrolled');
+  }
+  
+  lastScroll = currentScroll;
+});
+
+// 视差滚动效果
+const parallaxElements = document.querySelectorAll('.parallax-deco');
+
+window.addEventListener('scroll', () => {
+  const scrollY = window.pageYOffset;
+  parallaxElements.forEach(el => {
+    const speed = parseFloat(el.dataset.speed) || 0.3;
+    const rect = el.parentElement.getBoundingClientRect();
+    const parentTop = rect.top + scrollY;
+    const offset = (scrollY - parentTop) * speed;
+    el.style.transform = `translateY(${offset}px)`;
+  });
+});
+
+// 平滑滚动增强
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  });
+});
+
+// 图片懒加载渐入
+const imgRevealElements = document.querySelectorAll('.img-reveal');
+const imgObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'scale(1)';
+      entry.target.style.filter = 'blur(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+imgRevealElements.forEach(el => imgObserver.observe(el));
+</script>
+
+</body>
+</html>
